@@ -1,3 +1,24 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <updates>
+<update>
+  <name>Feed Curator</name>
+  <description>Feed Curator imports on-topic RSS and Atom items as unpublished Joomla articles; a board member publishes or discards them from a mail link</description>
+  <element>pkg_feedcurator</element>
+  <type>package</type>
+  <version>26.48.0</version>
+  <infourl title="Feed Curator">https://github.com/hans2103/pkg_feedcurator</infourl>
+  <downloads>
+    <downloadurl type="full" format="zip">https://github.com/hans2103/pkg_feedcurator/releases/download/v26.48.0/pkg_feedcurator-26.48.0.zip</downloadurl>
+  </downloads>
+  <sha512>57d466e254ce443078743cec79d1017c89b67483fbd31c9fab62ede01ffc2df308dd37ac32495b17c13c436ce7438a3771471797aa92504c4de6190ce35b6b62</sha512>
+  <tags>
+    <tag>stable</tag>
+  </tags>
+  <maintainer>HKweb</maintainer>
+  <maintainerurl>https://hkweb.nl</maintainerurl>
+  <section>Updates</section>
+  <targetplatform name="joomla" version="(5\.([2-9]|[1-9][0-9])|6\.[0-9])"/>
+  <php_minimum>8.3.0</php_minimum>
+  <client>site</client>
+</update>
 </updates>

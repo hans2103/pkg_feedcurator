@@ -15,6 +15,7 @@
     <files>
         <folder plugin="feedcurator">services</folder>
         <folder>src</folder>
+        <folder>tmpl</folder>
     </files>
 
     <languages>

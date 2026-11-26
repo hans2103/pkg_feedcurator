@@ -24,8 +24,7 @@ use Joomla\CMS\Event\Model\AfterSaveEvent;
 use Joomla\CMS\Event\Model\BeforeSaveEvent;
 use Joomla\CMS\Factory;
 use Joomla\CMS\Filter\OutputFilter;
-use Joomla\CMS\HTML\HTMLHelper;
-use Joomla\CMS\Language\Text;
+use Joomla\CMS\Language\Language;
 use Joomla\CMS\Table\Content;
 use Joomla\CMS\Version;
 use Joomla\CMS\Workflow\Workflow;
@@ -56,15 +55,16 @@ final class Importer
 	 * @var    \Closure(string, string): void
 	 * @since  __DEPLOY_VERSION__
 	 */
-	private readonly \Closure $log;
+	private readonly \Closure $logger;
 
 	/**
 	 * Constructor.
 	 *
 	 * @param   CMSApplicationInterface  $app    The application, for the event dispatcher and the workflow.
 	 * @param   DatabaseInterface        $db     The database.
-	 * @param   HttpFactory              $http   Creates the HTTP client for the feeds.
-	 * @param   ?\Closure                $log    Receives a message and a level (info, warning, error); default: no logging.
+	 * @param   HttpFactory              $http      Creates the HTTP client for the feeds.
+	 * @param   Language                 $language  The language of the site: the source line is stored content.
+	 * @param   ?\Closure                $log       Receives a message and a level (info, warning, error); default: no logging.
 	 *
 	 * @since   __DEPLOY_VERSION__
 	 */
@@ -72,9 +72,10 @@ final class Importer
 		private readonly CMSApplicationInterface $app,
 		private readonly DatabaseInterface $db,
 		private readonly HttpFactory $http,
+		private readonly Language $language,
 		?\Closure $log = null,
 	) {
-		$this->log = $log ?? static function (string $message, string $level): void {
+		$this->logger = $log ?? static function (string $message, string $level): void {
 		};
 	}
 
@@ -109,15 +110,16 @@ final class Importer
 			throw new FeedException('Geen site-URL ingesteld.');
 		}
 
-		$result      = new ImportResult;
-		$parser      = new FeedParser;
-		$now         = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
-		$general     = KeywordFilter::parseList((string) $params->get('keywords', ''));
-		$maxAge      = max(1, (int) $params->get('max_age_days', 30));
-		$firstWeeks  = max(0, (int) $params->get('first_run_weeks', 0));
-		$maxPerRun   = max(1, (int) $params->get('max_per_run', 10));
-		$candidates  = [];
-		$lookedBack  = [];
+		$result     = new ImportResult;
+		$parser     = new FeedParser;
+		$mapper     = new ArticleMapper;
+		$now        = new \DateTimeImmutable('now', new \DateTimeZone('UTC'));
+		$selector   = new Selector($now, $mapper);
+		$general    = KeywordFilter::parseList((string) $params->get('keywords', ''));
+		$maxAge     = max(1, (int) $params->get('max_age_days', 30));
+		$firstWeeks = max(0, (int) $params->get('first_run_weeks', 0));
+		$maxPerRun  = max(1, (int) $params->get('max_per_run', 10));
+		$lookedBack = [];
 
 		foreach ($sources as $source)
 		{
@@ -128,7 +130,7 @@ final class Importer
 			catch (FeedUnavailableException $e)
 			{
 				$result->unavailable[] = $source->name;
-				($this->log)(\sprintf('Bron %s niet beschikbaar: %s', $source->name, $e->getMessage()), 'warning');
+				$this->log(\sprintf('Bron %s niet beschikbaar: %s', $source->name, $e->getMessage()), 'warning');
 
 				continue;
 			}
@@ -156,76 +158,34 @@ final class Importer
 					continue;
 				}
 
-				$key = $item->key();
-
-				if (isset($candidates[$key]))
+				if (!$selector->add($item, $source, $lookBack))
 				{
-					// The same message from a second source: one article.
-					$candidates[$key]['lookback'] = $candidates[$key]['lookback'] || $lookBack;
-
-					continue;
+					$this->log('Item zonder bruikbare link of titel overgeslagen: ' . ($item->link ?: $item->guid), 'warning');
 				}
-
-				$candidates[$key] = ['item' => $item, 'source' => $source, 'lookback' => $lookBack];
 			}
 		}
 
-		$known = $this->knownKeys(array_keys($candidates));
-
-		foreach (array_keys($candidates) as $key)
-		{
-			if (isset($known[$key]))
-			{
-				$result->known++;
-				unset($candidates[$key]);
-			}
-		}
-
-		uasort(
-			$candidates,
-			fn (array $a, array $b): int => ($a['item']->published ?? $now) <=> ($b['item']->published ?? $now)
-		);
-
-		$selected = [];
-		$regular  = 0;
-
-		foreach ($candidates as $key => $candidate)
-		{
-			if (!$candidate['lookback'] && ++$regular > $maxPerRun)
-			{
-				continue;
-			}
-
-			$selected[$key] = $candidate;
-		}
+		$selected        = $selector->select($this->knownKeys($selector->keys()), $maxPerRun);
+		$result->known   = $selector->known;
+		$result->skipped += $selector->invalid;
 
 		$failedSources = [];
-		$mapper        = new ArticleMapper;
 		$author        = (int) $params->get('created_by', 0) ?: $this->fallbackAuthor();
 
-		foreach ($selected as $key => $candidate)
+		foreach ($selected as $candidate)
 		{
-			/** @var FeedItem $item */
-			$item = $candidate['item'];
-			/** @var Source $source */
+			$item   = $candidate['item'];
 			$source = $candidate['source'];
 
 			try
 			{
-				$article = $this->import($item, $source, $key, $mapper, (int) $params->get('catid'), $author);
+				$article = $this->import($item, $source, $candidate['key'], $mapper, (int) $params->get('catid'), $author);
 			}
 			catch (\Throwable $e)
 			{
 				$result->failed++;
 				$failedSources[$source->url] = true;
-				($this->log)(\sprintf('Item %s uit %s niet opgeslagen: %s', $item->link ?: $item->guid, $source->name, $e->getMessage()), 'error');
-
-				continue;
-			}
-
-			if ($article === null)
-			{
-				$result->skipped++;
+				$this->log(\sprintf('Item %s uit %s niet opgeslagen: %s', $item->link ?: $item->guid, $source->name, $e->getMessage()), 'error');
 
 				continue;
 			}
@@ -352,7 +312,7 @@ final class Importer
 		}
 		catch (\Throwable $e)
 		{
-			($this->log)('Terugblik van ' . $source->name . ' niet vastgelegd: ' . $e->getMessage(), 'warning');
+			$this->log('Terugblik van ' . $source->name . ' niet vastgelegd: ' . $e->getMessage(), 'warning');
 		}
 	}
 
@@ -395,32 +355,19 @@ final class Importer
 	 * @param   integer        $catid   The category.
 	 * @param   integer        $author  The author.
 	 *
-	 * @return  ?array{id: int, title: string}  The article, or null when the item can't become one.
+	 * @return  array{id: int, title: string}  The article.
 	 *
 	 * @throws  \RuntimeException  When the article can't be saved.
 	 *
 	 * @since   __DEPLOY_VERSION__
 	 */
-	private function import(FeedItem $item, Source $source, string $key, ArticleMapper $mapper, int $catid, int $author): ?array
+	private function import(FeedItem $item, Source $source, string $key, ArticleMapper $mapper, int $catid, int $author): array
 	{
-		if (!preg_match('#^https?://#i', $item->link))
-		{
-			($this->log)('Item zonder bruikbare link overgeslagen: ' . $item->title, 'warning');
-
-			return null;
-		}
-
-		$created = $mapper->map($item, $source, '');
-
-		if ($created['title'] === '')
-		{
-			return null;
-		}
-
-		$sourceLine = Text::sprintf(
-			'PLG_TASK_FEEDCURATOR_SOURCE_LINE',
+		$created    = $mapper->map($item, $source, '')['created'];
+		$sourceLine = \sprintf(
+			$this->language->_('PLG_TASK_FEEDCURATOR_SOURCE_LINE'),
 			htmlspecialchars($source->name, ENT_QUOTES, 'UTF-8'),
-			HTMLHelper::date($created['created'], Text::_('DATE_FORMAT_LC3')),
+			$this->formatDate($created),
 			htmlspecialchars($item->link, ENT_QUOTES, 'UTF-8')
 		);
 		$data = $mapper->map($item, $source, $sourceLine);
@@ -447,15 +394,19 @@ final class Importer
 		$article->images     = '{}';
 		$article->note       = $data['note'];
 
-		$this->store($article);
-
-		$row = (object) [
-			'item_key'   => $key,
-			'source'     => mb_substr($source->url, 0, 255),
-			'article_id' => (int) $article->id,
-			'imported'   => gmdate('Y-m-d H:i:s'),
-		];
-		$this->db->insertObject('#__feedcurator_items', $row);
+		// The row goes in right after the article is saved, so a later error can't lead to a duplicate.
+		$this->store(
+			$article,
+			function () use ($article, $key, $source): void {
+				$row = (object) [
+					'item_key'   => $key,
+					'source'     => mb_substr($source->url, 0, 255),
+					'article_id' => (int) $article->id,
+					'imported'   => gmdate('Y-m-d H:i:s'),
+				];
+				$this->db->insertObject('#__feedcurator_items', $row);
+			}
+		);
 
 		return ['id' => (int) $article->id, 'title' => $data['title']];
 	}
@@ -463,7 +414,8 @@ final class Importer
 	/**
 	 * Checks and stores the article with the content events, as the article model would.
 	 *
-	 * @param   Content  $article  The new article.
+	 * @param   Content   $article   The new article.
+	 * @param   \Closure  $remember  Called right after the article is stored, before the workflow and the after-save event.
 	 *
 	 * @return  void
 	 *
@@ -471,7 +423,7 @@ final class Importer
 	 *
 	 * @since   __DEPLOY_VERSION__
 	 */
-	private function store(Content $article): void
+	private function store(Content $article, \Closure $remember): void
 	{
 		$dispatcher = $this->app->getDispatcher();
 		$context    = 'com_content.article';
@@ -501,12 +453,68 @@ final class Importer
 			throw new \RuntimeException($article->getError());
 		}
 
+		$remember();
+
 		// Without a workflow association the article is missing from Content > Articles.
 		// @phpstan-ignore argument.type (Workflow asks for DatabaseDriver; the plugin gets the driver as DatabaseInterface.)
 		$workflow = new Workflow('com_content.article', $this->app, $this->db);
 		$workflow->createAssociation((int) $article->id, (int) $workflow->getDefaultStageByCategory((int) $article->catid));
 
 		$dispatcher->dispatch('onContentAfterSave', new AfterSaveEvent('onContentAfterSave', $arguments));
+	}
+
+	/**
+	 * Writes a line to the task log.
+	 *
+	 * @param   string  $message  The message.
+	 * @param   string  $level    info, warning or error.
+	 *
+	 * @return  void
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
+	private function log(string $message, string $level): void
+	{
+		($this->logger)($message, $level);
+	}
+
+	/**
+	 * Formats a UTC date in the language of the site (core format DATE_FORMAT_LC3, with translated names).
+	 *
+	 * Joomla's own date helpers translate with the language of the running application, which is
+	 * en-GB for cron jobs on the command line.
+	 *
+	 * @param   string  $utc  A date in UTC, Y-m-d H:i:s.
+	 *
+	 * @return  string
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
+	private function formatDate(string $utc): string
+	{
+		$zone   = new \DateTimeZone((string) $this->app->get('offset', 'UTC'));
+		$date   = (new \DateTimeImmutable($utc, new \DateTimeZone('UTC')))->setTimezone($zone);
+		$format = $this->language->_('DATE_FORMAT_LC3');
+		$months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
+		$days   = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+		$out    = '';
+
+		for ($i = 0, $n = \strlen($format); $i < $n; $i++)
+		{
+			$char = $format[$i];
+
+			$out .= match ($char)
+			{
+				'\\'  => $format[++$i] ?? '',
+				'F'    => $this->language->_($months[(int) $date->format('n') - 1]),
+				'M'    => $this->language->_($months[(int) $date->format('n') - 1] . '_SHORT'),
+				'l'    => $this->language->_($days[(int) $date->format('w')]),
+				'D'    => $this->language->_($days[(int) $date->format('w')] . '_SHORT'),
+				default => $date->format($char),
+			};
+		}
+
+		return $out;
 	}
 
 	/**

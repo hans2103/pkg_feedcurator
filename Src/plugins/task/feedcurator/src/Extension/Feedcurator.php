@@ -15,6 +15,10 @@ namespace HKweb\Plugin\Task\Feedcurator\Extension;
 use HKweb\Plugin\Task\Feedcurator\Feed\FeedException;
 use HKweb\Plugin\Task\Feedcurator\Import\FailureCounter;
 use HKweb\Plugin\Task\Feedcurator\Import\Importer;
+use Joomla\CMS\Component\ComponentHelper;
+use Joomla\CMS\Language\Language;
+use Joomla\CMS\Language\LanguageFactoryInterface;
+use Joomla\CMS\Factory;
 use Joomla\CMS\Plugin\CMSPlugin;
 use Joomla\Component\Scheduler\Administrator\Event\ExecuteTaskEvent;
 use Joomla\Component\Scheduler\Administrator\Task\Status as TaskStatus;
@@ -104,13 +108,14 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface
 	protected function import(ExecuteTaskEvent $event): int
 	{
 		$params   = new Registry($event->getArgument('params'));
-		$language = $this->getApplication()->getLanguage();
+		$language = $this->siteLanguage();
 		$counter  = new FailureCounter($this->getDatabase());
 		$taskId   = $event->getTaskId();
 		$importer = new Importer(
 			$this->getApplication(),
 			$this->getDatabase(),
 			$this->httpFactory,
+			$language,
 			$this->logTask(...)
 		);
 
@@ -161,5 +166,29 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface
 		}
 
 		return TaskStatus::OK;
+	}
+
+	/**
+	 * The language of the site, not of the running application (cron runs the command line in en-GB).
+	 *
+	 * Used for the stored source line and the log lines. The plugin strings come from the plugin's own
+	 * language folder when they are not installed in the administrator language folder.
+	 *
+	 * @return  Language
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
+	private function siteLanguage(): Language
+	{
+		$tag      = (string) ComponentHelper::getParams('com_languages')->get('site', 'en-GB');
+		$language = Factory::getContainer()->get(LanguageFactoryInterface::class)->createLanguage($tag, false);
+		$language->load('joomla', JPATH_ADMINISTRATOR, $tag, true);
+
+		if (!$language->load('plg_task_feedcurator', JPATH_ADMINISTRATOR, $tag, true))
+		{
+			$language->load('plg_task_feedcurator', JPATH_PLUGINS . '/task/feedcurator', $tag, true);
+		}
+
+		return $language;
 	}
 }

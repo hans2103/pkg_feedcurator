@@ -20,6 +20,9 @@ Scheduled task *Import feed items* (routine `feedcurator.import`). In the scaffo
 - `src/Extension/Feedcurator.php`: `TASKS_MAP` with `feedcurator.import` (language prefix `PLG_TASK_FEEDCURATOR_TASK_IMPORT`, form `import`).
 - `src/Feed/FeedParser.php`: parses RSS 2.0 (`channel/item`) and Atom (`feed/entry`) into `FeedItem` objects; throws `FeedUnavailableException` for anything else. Joomla-free. Items without a title, or without link and guid, are skipped. Atom: link from `rel="alternate"` (or no `rel`), date from `published`, else `updated`.
 - `src/Feed/FeedItem.php`: readonly value object (`guid`, `link`, `title`, `description`, `categories`, `published`); `key()` is the sha256 of the normalised link (trimmed, scheme and host lowercased, no fragment), or of the guid when there is no link.
+- `src/Feed/Source.php`: readonly settings of one source (`name`, `url`, `filter`, `keywords`, `exclude`, `enabled`); `fromArray()` builds it from a subform row, keyword textareas via `KeywordFilter::parseList()`.
+- `src/Feed/KeywordFilter.php`: `matches(FeedItem)` tests title, description (tags stripped) and categories against include and exclude terms: whole words, case-insensitive, trailing `*` is a word-ending wildcard, phrases match any whitespace. An exclude term wins; no include terms means no match. `parseList()` splits a textarea (one term per line, deduplicated).
+- `src/Feed/Summary.php`: `fromHtml()` removes the WordPress "Het bericht ... verscheen eerst op ..." footer, tags and entities, collapses whitespace and cuts at the last space before 300 characters with an ellipsis.
 - `src/Feed/FeedException.php`, `FeedUnavailableException.php`: error types.
 - `forms/import.xml`: task settings (empty for now).
 - `language/{en-GB,nl-NL}/`: `plg_task_feedcurator.ini` and `.sys.ini`.

@@ -44,8 +44,8 @@ final class KeywordFilter
 	 */
 	public function __construct(array $include, array $exclude)
 	{
-		$this->includePatterns = array_map([self::class, 'pattern'], $include);
-		$this->excludePatterns = array_map([self::class, 'pattern'], $exclude);
+		$this->includePatterns = self::patterns($include);
+		$this->excludePatterns = self::patterns($exclude);
 	}
 
 	/**
@@ -112,6 +112,30 @@ final class KeywordFilter
 		}
 
 		return array_values($terms);
+	}
+
+	/**
+	 * Patterns for the terms that have a word besides wildcards; a term such as * would match everything.
+	 *
+	 * @param   list<string>  $terms  Terms.
+	 *
+	 * @return  list<string>
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
+	private static function patterns(array $terms): array
+	{
+		$patterns = [];
+
+		foreach ($terms as $term)
+		{
+			if (trim($term, "* \t\n\r") !== '')
+			{
+				$patterns[] = self::pattern($term);
+			}
+		}
+
+		return $patterns;
 	}
 
 	/**

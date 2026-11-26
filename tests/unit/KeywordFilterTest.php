@@ -45,6 +45,14 @@ check('include without exclude', $f->matches(item('Een beperking in de ruimte'))
 
 check('empty include matches nothing', (new KeywordFilter([], []))->matches(item('Wmo')), false);
 
+check('wildcard-only term matches nothing', (new KeywordFilter(['*'], []))->matches(item('Wmo')), false);
+check('double wildcard matches nothing', (new KeywordFilter(['**'], []))->matches(item('Wmo')), false);
+check('empty term matches nothing', (new KeywordFilter([''], []))->matches(item('Wmo')), false);
+$f = new KeywordFilter(['*', 'Wmo'], []);
+check('stray * does not break real term', $f->matches(item('De Wmo')), true);
+check('stray * does not match unrelated', $f->matches(item('Fietsen')), false);
+check('wildcard-only exclude is ignored', (new KeywordFilter(['wmo'], ['*']))->matches(item('Wmo')), true);
+
 $f = new KeywordFilter(['ziek*'], []);
 check('unicode', $f->matches(item('Chronisch zieken')), true);
 $f = new KeywordFilter(['café'], []);

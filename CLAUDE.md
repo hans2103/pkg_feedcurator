@@ -93,9 +93,9 @@ Calendar versioning `YY.WW.PATCH` (first version `26.48.0`). The single source o
 ## Important Implementation Details
 
 - Links: `ReviewToken::url()` builds `index.php?option=com_ajax&group=system&plugin=feedcurator&format=html&a=&u=&e=&s=` (article, user, expiry, HMAC of `a|u|e` with a key derived from the site secret). GET shows, POST (with form token) acts. An empty site secret means no mail and no valid link.
-- Known limits (v1): com_content workflows must be off; recipients need `core.edit.state`; the task needs `site_url` (CLI); the review page can be page-cached and a template may treat a URL without Itemid as the homepage. See the README.
+- The system plugin excludes the review page from System - Page Cache itself (`onPageCacheIsExcluded`, `PageCachePolicy`): the cache ignores `Cache-Control: no-store`, and a cached copy would hold the form token of the first visitor.
+- Known limits (v1): com_content workflows must be off; recipients need `core.edit.state`; the task needs `site_url` (CLI); a template may treat a URL without Itemid as the homepage. See the README.
 - The review action sets the request option to `com_content` and the current user while it calls the Article model, so the action log records it; both are restored afterwards.
-
 - Tables: `#__feedcurator_items` (item key, sha256 of the link, to article), `#__feedcurator_failures` (failed runs in a row per task) and `#__feedcurator_sources` (sources whose one-time look-back is done, per task).
 - The task provider registers the namespace of the system plugin (`JLoader::registerNamespace`), because the routine uses `ReviewToken` from there.
 - Articles hold no full text and no images from the source: title, a short summary and a source line with the link.

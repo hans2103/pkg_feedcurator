@@ -88,4 +88,8 @@ check('source filter off', $s->filter, false);
 check('source missing keywords', $s->keywords, []);
 check('source enabled off', $s->enabled, false);
 
+// Invalid UTF-8 terms are skipped: they must not compile to a pattern that matches everything.
+check('invalid UTF-8 term matches nothing', (new KeywordFilter(["\xC3\x28"], []))->matches(item('Nieuws', 'Over fietsen')), false);
+check('trailing invalid byte matches nothing', (new KeywordFilter(["a\xFF"], []))->matches(item('Nieuws', 'a b c')), false);
+
 finish('KeywordFilter');

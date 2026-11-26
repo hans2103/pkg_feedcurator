@@ -143,7 +143,15 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface
 
 		if ($result->created !== [])
 		{
-			(new Notifier($this->getApplication(), $this->getDatabase(), $language, $this->logTask(...)))->notify($result, $params);
+			try
+			{
+				(new Notifier($this->getApplication(), $this->getDatabase(), $language, $this->logTask(...)))->notify($result, $params);
+			}
+			catch (\Throwable $e)
+			{
+				// The articles are saved; a mail problem must not skip the failure counter below.
+				$this->logTask(\sprintf($language->_('PLG_TASK_FEEDCURATOR_LOG_MAIL_ERROR'), $e->getMessage()), 'error');
+			}
 		}
 
 		if ($result->unavailable !== [])

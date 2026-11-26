@@ -129,9 +129,17 @@ final class KeywordFilter
 
 		foreach ($terms as $term)
 		{
-			if (preg_match('/^[\s\x{00A0}*]*$/u', $term) !== 1)
+			// A term that is not valid UTF-8 would make the /u pattern fail or match everything: skip it.
+			if (preg_match('//u', $term) !== 1 || preg_match('/^[\s\x{00A0}*]*$/u', $term) === 1)
 			{
-				$patterns[] = self::pattern($term);
+				continue;
+			}
+
+			$pattern = self::pattern($term);
+
+			if ($pattern !== null)
+			{
+				$patterns[] = $pattern;
 			}
 		}
 
@@ -141,15 +149,22 @@ final class KeywordFilter
 	/**
 	 * @param   string  $term  One term.
 	 *
-	 * @return  string  Regular expression.
+	 * @return  ?string  Regular expression, or null when the term has no word.
 	 *
 	 * @since   __DEPLOY_VERSION__
 	 */
-	private static function pattern(string $term): string
+	private static function pattern(string $term): ?string
 	{
 		$wildcard = str_ends_with($term, '*');
 		$words    = preg_split('/[\s\x{00A0}]+/u', (string) preg_replace('/^[\s\x{00A0}*]+|[\s\x{00A0}*]+$/u', '', $term)) ?: [];
-		$regex    = implode('\s+', array_map(static fn (string $w): string => preg_quote($w, '/'), $words));
+		$words    = array_filter($words, static fn (string $w): bool => $w !== '');
+
+		if ($words === [])
+		{
+			return null;
+		}
+
+		$regex = implode('\s+', array_map(static fn (string $w): string => preg_quote($w, '/'), $words));
 
 		return '/(?<!\w)' . $regex . ($wildcard ? '\w*' : '') . '(?!\w)/iu';
 	}

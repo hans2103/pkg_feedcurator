@@ -497,6 +497,7 @@ final class Importer
 		$format = $this->language->_('DATE_FORMAT_LC3');
 		$months = ['JANUARY', 'FEBRUARY', 'MARCH', 'APRIL', 'MAY', 'JUNE', 'JULY', 'AUGUST', 'SEPTEMBER', 'OCTOBER', 'NOVEMBER', 'DECEMBER'];
 		$days   = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
+		$short  = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
 		$out    = '';
 
 		for ($i = 0, $n = \strlen($format); $i < $n; $i++)
@@ -509,7 +510,7 @@ final class Importer
 				'F'    => $this->language->_($months[(int) $date->format('n') - 1]),
 				'M'    => $this->language->_($months[(int) $date->format('n') - 1] . '_SHORT'),
 				'l'    => $this->language->_($days[(int) $date->format('w')]),
-				'D'    => $this->language->_($days[(int) $date->format('w')] . '_SHORT'),
+				'D'    => $this->language->_($short[(int) $date->format('w')]),
 				default => $date->format($char),
 			};
 		}

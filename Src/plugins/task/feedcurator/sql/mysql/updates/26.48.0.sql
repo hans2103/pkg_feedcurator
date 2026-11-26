@@ -4,7 +4,7 @@
 --
 -- item_key    sha256 van de genormaliseerde link van het item (of van de guid als er geen link is)
 -- source      URL van de feed waaruit het item kwam
--- article_id  Joomla-artikel; NULL als het artikel is weggegooid
+-- article_id  Joomla-artikel; NULL is gereserveerd en wordt nu niet gebruikt (een weggegooid artikel houdt zijn id)
 -- imported    moment van importeren (UTC)
 --
 CREATE TABLE IF NOT EXISTS `#__feedcurator_items` (

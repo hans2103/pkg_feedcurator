@@ -12,6 +12,9 @@ declare(strict_types=1);
 
 namespace HKweb\Plugin\Task\Feedcurator\Extension;
 
+use HKweb\Plugin\Task\Feedcurator\Feed\FeedException;
+use HKweb\Plugin\Task\Feedcurator\Import\FailureCounter;
+use HKweb\Plugin\Task\Feedcurator\Import\Importer;
 use Joomla\CMS\Plugin\CMSPlugin;
 use Joomla\Component\Scheduler\Administrator\Event\ExecuteTaskEvent;
 use Joomla\Component\Scheduler\Administrator\Task\Status as TaskStatus;
@@ -19,6 +22,7 @@ use Joomla\Component\Scheduler\Administrator\Traits\TaskPluginTrait;
 use Joomla\Database\DatabaseAwareTrait;
 use Joomla\Event\SubscriberInterface;
 use Joomla\Http\HttpFactory;
+use Joomla\Registry\Registry;
 
 // phpcs:disable PSR1.Files.SideEffects
 \defined('_JEXEC') or die;
@@ -86,16 +90,76 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface
 	}
 
 	/**
-	 * The routine feedcurator.import: placeholder that succeeds; the import follows in a later release.
+	 * The routine feedcurator.import: imports the feeds with the settings of the task.
+	 *
+	 * When a source is unavailable, the run only counts as failed (KNOCKOUT, and so the failure
+	 * mail) from the setting notify_after failed runs in a row on; before that it logs a warning.
 	 *
 	 * @param   ExecuteTaskEvent  $event  The task event.
 	 *
-	 * @return  integer  A TaskStatus constant.
+	 * @return  integer  A TaskStatus constant: OK, or KNOCKOUT when the settings are incomplete or sources keep failing.
 	 *
 	 * @since   __DEPLOY_VERSION__
 	 */
 	protected function import(ExecuteTaskEvent $event): int
 	{
+		$params   = new Registry($event->getArgument('params'));
+		$language = $this->getApplication()->getLanguage();
+		$counter  = new FailureCounter($this->getDatabase());
+		$taskId   = $event->getTaskId();
+		$importer = new Importer(
+			$this->getApplication(),
+			$this->getDatabase(),
+			$this->httpFactory,
+			$this->logTask(...)
+		);
+
+		try
+		{
+			$result = $importer->run($params, $taskId);
+		}
+		catch (FeedException $e)
+		{
+			$this->logTask($e->getMessage(), 'error');
+
+			return TaskStatus::KNOCKOUT;
+		}
+
+		$this->logTask(
+			\sprintf(
+				$language->_('PLG_TASK_FEEDCURATOR_LOG_RESULT'),
+				\count($result->created),
+				$result->skipped,
+				$result->known,
+				$result->failed
+			)
+		);
+
+		if ($result->unavailable !== [])
+		{
+			$failures  = $counter->increment($taskId);
+			$threshold = (int) $params->get('notify_after', 3);
+			$names     = implode(', ', $result->unavailable);
+
+			if (!FailureCounter::shouldReport($failures, $threshold))
+			{
+				$this->logTask(\sprintf($language->_('PLG_TASK_FEEDCURATOR_LOG_RETRY'), $names, $failures, $threshold), 'warning');
+
+				return TaskStatus::OK;
+			}
+
+			$this->logTask(\sprintf($language->_('PLG_TASK_FEEDCURATOR_LOG_FAILED'), $names, $failures), 'error');
+
+			return TaskStatus::KNOCKOUT;
+		}
+
+		$previous = $counter->reset($taskId);
+
+		if ($previous > 0)
+		{
+			$this->logTask(\sprintf($language->_('PLG_TASK_FEEDCURATOR_LOG_RECOVERED'), $previous));
+		}
+
 		return TaskStatus::OK;
 	}
 }

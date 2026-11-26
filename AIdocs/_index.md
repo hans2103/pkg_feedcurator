@@ -7,8 +7,8 @@ Verified documentation for AI assistants. Read this index first, then the page f
 | Page | Covers |
 |---|---|
 | [pkg_feedcurator](pkg_feedcurator.md) | The Joomla package: `package.xml`, `package_script.php` (minimum versions, enabling the plugins on first install), the package language and the `package.sh` build. |
-| [plg_task_feedcurator](plg_task_feedcurator.md) | The scheduled task: routine \`feedcurator.import\`, its form, the language files and the three tables. |
-| [plg_system_feedcurator](plg_system_feedcurator.md) | The review page (\`onAjaxFeedcurator\`). |
+| [plg_task_feedcurator](plg_task_feedcurator.md) | The scheduled task: routine `feedcurator.import`, its form, the language files and the three tables. |
+| [plg_system_feedcurator](plg_system_feedcurator.md) | The review page (`onAjaxFeedcurator`). |
 
 ## Keeping the pages true
 

@@ -1,19 +1,27 @@
 # Task plugin (plg_task_feedcurator)
 
 ### History
+- 2026-11-26: purpose, settings, link format and workflow limitation checked against the finished code
 - 2026-11-26: Notifier sends no mail when the site secret is empty (`PLG_TASK_FEEDCURATOR_LOG_MAIL_NO_SECRET`)
 - 2026-11-26: added `src/Mail/` (notification mail with signed review links) and the Notifier call in the routine
 - 2026-11-26: added `src/Feed/` (RSS 2.0 and Atom parser)
 - 2026-11-26: page created with the scaffold; the routine is a placeholder that returns OK
 
 Last updated: 2026-11-26
-Verified against: 7c3fd72
+Verified against: 00130a8
 Covers:
 - Src/plugins/task/feedcurator/
 
 ## Purpose
 
-Scheduled task *Import feed items* (routine `feedcurator.import`). In the scaffold the routine only returns `TaskStatus::OK`; the feed parsing and import follow in later tasks of the plan.
+Scheduled task *Import feed items* (routine `feedcurator.import`). Per run: fetch the enabled sources, filter on keywords, save new items as unpublished articles (state 0) in `catid`, then mail the board members in `notify_groups` one signed review link per article. The review itself is in `plg_system_feedcurator`.
+
+## Settings and requirements
+
+- Settings live in `forms/import.xml`: `sources` (subform: `name`, `url` https only, `filter`, `keywords`, `exclude`, `enabled`), global `keywords`, `catid`, `created_by`, `max_age_days` (30), `max_per_run` (10), `first_run_weeks` (0 = off), `notify_groups`, `site_url` (required), `link_days` (7), `notify_after` (3).
+- `site_url` is required because the task runs on the CLI, where Joomla does not know the public URL; the review links are built from it (`ReviewToken::url()` -> `index.php?option=com_ajax&group=system&plugin=feedcurator&format=html&a=&u=&e=&s=`, GET shows, POST acts).
+- The links are signed with the site secret (`$app->get('secret')`); with an empty secret no mail is sent. Recipients need `core.edit.state` on the target category, or the review page refuses the action.
+- Workflow limitation (v1): articles are saved with the default workflow association, but com_content workflows must be off: with workflows on, the review page cannot change the state (the workflow plugin refuses) and points to the administrator.
 
 ## Files
 

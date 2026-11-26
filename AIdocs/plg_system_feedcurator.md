@@ -6,7 +6,7 @@
 - 2026-11-26: page created with the scaffold; the review handler is empty
 
 Last updated: 2026-11-26
-Verified against: 7c3fd72
+Verified against: 00130a8
 Covers:
 - Src/plugins/system/feedcurator/
 
@@ -33,3 +33,9 @@ The review page behind the mail link: `index.php?option=com_ajax&group=system&pl
 3. Outcome: Invalid → `INVALID` (403); Expired → `EXPIRED` (410); AlreadyDone → `DONE_PUBLISHED` / `DONE_TRASHED` / `DONE_OTHER` plus a link to a published article; Show → article and form. GET never writes anything.
 4. Act (POST): `Session::checkToken()` (failure → `TOKEN`, 403; a new session gets Joomla's own redirect); `core.edit.state` on `com_content.article.{id}` for the user (missing → `NO_RIGHTS`, 403). Then `$app->loadIdentity($user)` and the input `option` set to `com_content` (the action log only logs loggable extensions), `createModel('Article', 'Administrator', ['ignore_request' => true])`, `setCurrentUser($user)`, `publish([$id], 1 | -2)`; both restored in `finally`.
 5. A false return, an exception (com_content workflows on: the workflow plugin refuses) or an unchanged state (checked out by someone else) → the error, `USE_ADMIN` and a link to the article in the administrator. Success → `PUBLISHED` with a link to the article, or `DISCARDED` (trash; the item key stays in `#__feedcurator_items`, so the import does not bring it back).
+
+## Known limits
+
+- com_content workflows must be off (v1); with workflows on, publishing fails and the page points to the administrator.
+- The page sends `Cache-Control: no-store`, but the System - Page Cache plugin can still cache it; a fix may follow.
+- A site template that treats a URL without Itemid as the homepage may show the homepage instead of the review page.

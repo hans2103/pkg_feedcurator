@@ -1,10 +1,11 @@
 # Package (pkg_feedcurator)
 
 ### History
+- 2026-11-26: checked against the finished package
 - 2026-11-26: page created with the repository scaffold
 
 Last updated: 2026-11-26
-Verified against: b62791a
+Verified against: 00130a8
 Covers:
 - package.xml
 - package_script.php

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+	<title>Verzonnen Atom-feed</title>
+	<id>tag:example.com,2026:feed</id>
+	<updated>2026-11-25T09:00:00Z</updated>
+	<entry>
+		<title>Toegankelijk wandelen</title>
+		<id>tag:example.com,2026:wandelen</id>
+		<link rel="self" href="https://example.com/feed/wandelen"/>
+		<link rel="alternate" type="text/html" href="https://example.com/wandelen"/>
+		<updated>2026-11-25T09:00:00+01:00</updated>
+		<category term="Sport"/>
+		<summary type="html">&lt;p&gt;Een verzonnen wandeling.&lt;/p&gt;</summary>
+	</entry>
+	<entry>
+		<title>Open dag</title>
+		<id>tag:example.com,2026:open-dag</id>
+		<link href="https://example.com/open-dag"/>
+		<published>2026-11-20T12:00:00Z</published>
+		<updated>2026-11-22T12:00:00Z</updated>
+		<summary>Gewone tekst.</summary>
+	</entry>
+</feed>

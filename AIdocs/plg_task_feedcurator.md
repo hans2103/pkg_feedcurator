@@ -1,6 +1,7 @@
 # Task plugin (plg_task_feedcurator)
 
 ### History
+- 2026-11-26: added `src/Feed/` (RSS 2.0 and Atom parser)
 - 2026-11-26: page created with the scaffold; the routine is a placeholder that returns OK
 
 Last updated: 2026-11-26
@@ -17,6 +18,9 @@ Scheduled task *Import feed items* (routine `feedcurator.import`). In the scaffo
 - `feedcurator.xml`: manifest, namespace `HKweb\Plugin\Task\Feedcurator` on `src/`, SQL install/uninstall/update.
 - `services/provider.php`: registers the plugin lazily with an `HttpFactory`. It also registers the namespace `HKweb\Plugin\System\Feedcurator` (`JLoader::registerNamespace`), because the routine will use `ReviewToken` from the system plugin.
 - `src/Extension/Feedcurator.php`: `TASKS_MAP` with `feedcurator.import` (language prefix `PLG_TASK_FEEDCURATOR_TASK_IMPORT`, form `import`).
+- `src/Feed/FeedParser.php`: parses RSS 2.0 (`channel/item`) and Atom (`feed/entry`) into `FeedItem` objects; throws `FeedUnavailableException` for anything else. Joomla-free. Items without a title, or without link and guid, are skipped. Atom: link from `rel="alternate"` (or no `rel`), date from `published`, else `updated`.
+- `src/Feed/FeedItem.php`: readonly value object (`guid`, `link`, `title`, `description`, `categories`, `published`); `key()` is the sha256 of the normalised link (trimmed, scheme and host lowercased, no fragment), or of the guid when there is no link.
+- `src/Feed/FeedException.php`, `FeedUnavailableException.php`: error types.
 - `forms/import.xml`: task settings (empty for now).
 - `language/{en-GB,nl-NL}/`: `plg_task_feedcurator.ini` and `.sys.ini`.
 

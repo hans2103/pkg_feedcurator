@@ -19,7 +19,7 @@ namespace HKweb\Plugin\Task\Feedcurator\Feed;
 /**
  * One entry of an RSS or Atom feed.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  26.48.0
  */
 final readonly class FeedItem
 {
@@ -33,7 +33,7 @@ final readonly class FeedItem
 	 * @param   list<string>         $categories   Category labels from the feed.
 	 * @param   ?\DateTimeImmutable  $published    Publication date, when the feed gives one.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function __construct(
 		public string $guid,
@@ -51,7 +51,7 @@ final readonly class FeedItem
 	 *
 	 * @return  string  SHA-256 hash in hexadecimal.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function key(): string
 	{

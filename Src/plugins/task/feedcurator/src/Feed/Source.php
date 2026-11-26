@@ -19,7 +19,7 @@ namespace HKweb\Plugin\Task\Feedcurator\Feed;
 /**
  * Settings of one feed source (one row of the sources subform).
  *
- * @since  __DEPLOY_VERSION__
+ * @since  26.48.0
  */
 final readonly class Source
 {
@@ -31,7 +31,7 @@ final readonly class Source
 	 * @param   list<string>  $exclude   Terms that reject an item.
 	 * @param   bool          $enabled   Whether the source is imported.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function __construct(
 		public string $name,
@@ -50,7 +50,7 @@ final readonly class Source
 	 *
 	 * @return  self
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public static function fromArray(array $row): self
 	{
@@ -69,7 +69,7 @@ final readonly class Source
 	 *
 	 * @return  bool
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private static function flag(mixed $value): bool
 	{

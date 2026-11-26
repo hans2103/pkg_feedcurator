@@ -23,7 +23,7 @@ namespace HKweb\Plugin\System\Feedcurator\Review;
  * signature (s) of "a|u|e", made with a key derived from the site secret. Joomla-free.
  * An empty site secret would make every link forgeable: sign() then refuses and verify() is always false.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  26.48.0
  */
 final class ReviewToken
 {
@@ -31,7 +31,7 @@ final class ReviewToken
 	 * The signing key, derived from the site secret.
 	 *
 	 * @var    string
-	 * @since  __DEPLOY_VERSION__
+	 * @since  26.48.0
 	 */
 	private readonly string $key;
 
@@ -39,7 +39,7 @@ final class ReviewToken
 	 * Whether the site secret is usable (not empty or whitespace).
 	 *
 	 * @var    boolean
-	 * @since  __DEPLOY_VERSION__
+	 * @since  26.48.0
 	 */
 	private readonly bool $usable;
 
@@ -48,7 +48,7 @@ final class ReviewToken
 	 *
 	 * @param   string  $siteSecret  The secret of the site (configuration.php).
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function __construct(string $siteSecret)
 	{
@@ -61,7 +61,7 @@ final class ReviewToken
 	 *
 	 * @return  boolean
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function isUsable(): bool
 	{
@@ -79,7 +79,7 @@ final class ReviewToken
 	 *
 	 * @throws  \InvalidArgumentException  When the site secret is empty.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function sign(int $articleId, int $userId, int $expires): string
 	{
@@ -101,7 +101,7 @@ final class ReviewToken
 	 *
 	 * @return  boolean  True when the signature is genuine; always false with an empty site secret.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function isGenuine(int $articleId, int $userId, int $expires, string $signature): bool
 	{
@@ -119,7 +119,7 @@ final class ReviewToken
 	 *
 	 * @return  boolean  True when the signature is genuine and the link has not expired.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function verify(int $articleId, int $userId, int $expires, string $signature, int $now): bool
 	{
@@ -135,7 +135,7 @@ final class ReviewToken
 	 *
 	 * @return  string
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function hmac(int $articleId, int $userId, int $expires): string
 	{
@@ -153,7 +153,7 @@ final class ReviewToken
 	 *
 	 * @return  string
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public static function url(string $siteUrl, int $articleId, int $userId, int $expires, string $signature): string
 	{

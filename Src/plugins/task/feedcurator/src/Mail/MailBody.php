@@ -19,7 +19,7 @@ namespace HKweb\Plugin\Task\Feedcurator\Mail;
 /**
  * Builds the HTML and plain text body of the notification mail. Joomla-free.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  26.48.0
  */
 final class MailBody
 {
@@ -32,7 +32,7 @@ final class MailBody
 	 *
 	 * @return  string
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public static function html(string $intro, array $items, string $linkLabel): string
 	{
@@ -62,7 +62,7 @@ final class MailBody
 	 *
 	 * @return  string
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public static function text(string $intro, array $items, string $linkLabel): string
 	{
@@ -84,7 +84,7 @@ final class MailBody
 	 *
 	 * @return  string
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private static function escape(string $value): string
 	{

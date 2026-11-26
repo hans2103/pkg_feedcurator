@@ -22,7 +22,7 @@ use Joomla\Database\ParameterType;
 /**
  * Counts the runs in a row in which a feed was unavailable, per scheduled task.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  26.48.0
  */
 final class FailureCounter
 {
@@ -31,7 +31,7 @@ final class FailureCounter
 	 *
 	 * @param   DatabaseInterface  $db  The database.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function __construct(private readonly DatabaseInterface $db)
 	{
@@ -44,7 +44,7 @@ final class FailureCounter
 	 *
 	 * @return  integer  The number of failed runs in a row, including this one.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function increment(int $taskId): int
 	{
@@ -73,7 +73,7 @@ final class FailureCounter
 	 *
 	 * @return  integer  The number of failed runs in a row before this success (0: none).
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function reset(int $taskId): int
 	{
@@ -100,7 +100,7 @@ final class FailureCounter
 	 *
 	 * @return  boolean
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public static function shouldReport(int $failures, int $threshold): bool
 	{
@@ -114,7 +114,7 @@ final class FailureCounter
 	 *
 	 * @return  integer
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function count(int $taskId): int
 	{

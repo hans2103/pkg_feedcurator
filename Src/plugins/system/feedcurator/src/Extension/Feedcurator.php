@@ -47,7 +47,7 @@ use Joomla\Event\SubscriberInterface;
  * same signed fields and a form token publishes (state 1) or trashes (state -2) the article through the
  * com_content article model, under the identity of the user the link was signed for.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  26.48.0
  */
 final class Feedcurator extends CMSPlugin implements SubscriberInterface, UserFactoryAwareInterface
 {
@@ -58,7 +58,7 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface, UserFa
 	 * Language keys for the article states.
 	 *
 	 * @var    array<int, string>
-	 * @since  __DEPLOY_VERSION__
+	 * @since  26.48.0
 	 */
 	private const STATES = [
 		0  => 'PLG_SYSTEM_FEEDCURATOR_STATE_CONCEPT',
@@ -72,7 +72,7 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface, UserFa
 	 *
 	 * @return  array<string, string>
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public static function getSubscribedEvents(): array
 	{
@@ -90,7 +90,7 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface, UserFa
 	 *
 	 * @return  void
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function excludeFromPageCache(IsExcludedEvent $event): void
 	{
@@ -111,7 +111,7 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface, UserFa
 	 *
 	 * @return  void
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function review(AjaxEvent $event): void
 	{
@@ -145,7 +145,7 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface, UserFa
 	 *
 	 * @return  array<string, mixed>  The display data for tmpl/review.php.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function handle(CMSApplicationInterface $app): array
 	{
@@ -222,7 +222,7 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface, UserFa
 	 *
 	 * @return  array<string, mixed>  The display data.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function act(CMSApplicationInterface $app, Content $article, User $user, string $action): array
 	{
@@ -314,7 +314,7 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface, UserFa
 	 *
 	 * @return  array{type: string, text: string}
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function doneMessage(int $state): array
 	{
@@ -333,7 +333,7 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface, UserFa
 	 *
 	 * @return  list<array{url: string, text: string}>
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function resultLinks(Content $article, int $state): array
 	{
@@ -355,7 +355,7 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface, UserFa
 	 *
 	 * @return  array{url: string, text: string}
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function adminLink(int $id): array
 	{
@@ -372,7 +372,7 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface, UserFa
 	 *
 	 * @return  ?array{title: string, state: string, summary: string, source: string, link: string, linkText: string}
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function articleData(?Content $article): ?array
 	{
@@ -392,7 +392,7 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface, UserFa
 	 *
 	 * @return  string
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function stateLabel(int $state): string
 	{
@@ -407,7 +407,7 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface, UserFa
 	 *
 	 * @return  array{type: string, text: string}
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function message(string $type, string $key): array
 	{
@@ -425,7 +425,7 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface, UserFa
 	 *
 	 * @return  array<string, mixed>
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function page(array $messages, int $status = 200, ?array $article = null, ?array $form = null, array $links = []): array
 	{
@@ -450,7 +450,7 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface, UserFa
 	 *
 	 * @return  string
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function render(array $displayData): string
 	{

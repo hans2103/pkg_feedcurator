@@ -26,7 +26,7 @@ use HKweb\Plugin\Task\Feedcurator\Feed\Source;
  * Items that can never become an article (no http(s) link, no title) are rejected on entry, so
  * they never take a slot of max_per_run.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  26.48.0
  */
 final class Selector
 {
@@ -34,7 +34,7 @@ final class Selector
 	 * The candidates by item key.
 	 *
 	 * @var    array<string, array{item: FeedItem, source: Source, lookback: bool}>
-	 * @since  __DEPLOY_VERSION__
+	 * @since  26.48.0
 	 */
 	private array $candidates = [];
 
@@ -42,7 +42,7 @@ final class Selector
 	 * Number of items rejected because they can't become an article.
 	 *
 	 * @var    integer
-	 * @since  __DEPLOY_VERSION__
+	 * @since  26.48.0
 	 */
 	public int $invalid = 0;
 
@@ -50,7 +50,7 @@ final class Selector
 	 * Number of candidates that were known and so left out by select().
 	 *
 	 * @var    integer
-	 * @since  __DEPLOY_VERSION__
+	 * @since  26.48.0
 	 */
 	public int $known = 0;
 
@@ -60,7 +60,7 @@ final class Selector
 	 * @param   \DateTimeImmutable  $now     The moment of the run, for items without a date.
 	 * @param   ArticleMapper       $mapper  The mapper, to see whether an item gets a title.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function __construct(private readonly \DateTimeImmutable $now, private readonly ArticleMapper $mapper)
 	{
@@ -75,7 +75,7 @@ final class Selector
 	 *
 	 * @return  boolean  False when the item can't become an article.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function add(FeedItem $item, Source $source, bool $lookback): bool
 	{
@@ -106,7 +106,7 @@ final class Selector
 	 *
 	 * @return  list<string>
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function keys(): array
 	{
@@ -121,7 +121,7 @@ final class Selector
 	 *
 	 * @return  list<array{key: string, item: FeedItem, source: Source, lookback: bool}>
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function select(array $known, int $maxPerRun): array
 	{

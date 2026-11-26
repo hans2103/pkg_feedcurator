@@ -36,7 +36,7 @@ use Joomla\Registry\Registry;
 /**
  * Scheduler routine that imports on-topic feed items as unpublished Joomla articles.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  26.48.0
  */
 final class Feedcurator extends CMSPlugin implements SubscriberInterface
 {
@@ -47,7 +47,7 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface
 	 * The routines this plugin offers to the scheduler.
 	 *
 	 * @var    array<string, array{langConstPrefix: string, form: string, method: string}>
-	 * @since  __DEPLOY_VERSION__
+	 * @since  26.48.0
 	 */
 	protected const TASKS_MAP = [
 		'feedcurator.import' => [
@@ -61,7 +61,7 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface
 	 * Load the language file on instantiation.
 	 *
 	 * @var    boolean
-	 * @since  __DEPLOY_VERSION__
+	 * @since  26.48.0
 	 */
 	protected $autoloadLanguage = true;
 
@@ -71,7 +71,7 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface
 	 * @param   array<string, mixed>  $config       The plugin configuration.
 	 * @param   HttpFactory           $httpFactory  Creates the HTTP client for the feeds.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function __construct(array $config, private readonly HttpFactory $httpFactory)
 	{
@@ -83,7 +83,7 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface
 	 *
 	 * @return  array<string, string>
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public static function getSubscribedEvents(): array
 	{
@@ -104,7 +104,7 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface
 	 *
 	 * @return  integer  A TaskStatus constant: OK, or KNOCKOUT when the settings are incomplete or sources keep failing.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	protected function import(ExecuteTaskEvent $event): int
 	{
@@ -190,7 +190,7 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface
 	 *
 	 * @return  Language
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function siteLanguage(): Language
 	{

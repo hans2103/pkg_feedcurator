@@ -19,42 +19,42 @@ namespace HKweb\Plugin\System\Feedcurator\Review;
 /**
  * What the review page does with a request. Joomla-free.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  26.48.0
  */
 enum ReviewOutcome: string
 {
 	/**
 	 * Show the article and the form (GET on a concept).
 	 *
-	 * @since  __DEPLOY_VERSION__
+	 * @since  26.48.0
 	 */
 	case Show = 'show';
 
 	/**
 	 * The link or the request is not genuine.
 	 *
-	 * @since  __DEPLOY_VERSION__
+	 * @since  26.48.0
 	 */
 	case Invalid = 'invalid';
 
 	/**
 	 * The link is genuine but has expired.
 	 *
-	 * @since  __DEPLOY_VERSION__
+	 * @since  26.48.0
 	 */
 	case Expired = 'expired';
 
 	/**
 	 * The article is no longer a concept: published, trashed or archived already.
 	 *
-	 * @since  __DEPLOY_VERSION__
+	 * @since  26.48.0
 	 */
 	case AlreadyDone = 'done';
 
 	/**
 	 * Publish or discard the article (POST on a concept).
 	 *
-	 * @since  __DEPLOY_VERSION__
+	 * @since  26.48.0
 	 */
 	case Act = 'act';
 }

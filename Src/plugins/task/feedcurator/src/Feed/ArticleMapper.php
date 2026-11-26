@@ -20,7 +20,7 @@ namespace HKweb\Plugin\Task\Feedcurator\Feed;
  * Maps a feed item to the fields of an unpublished article. The article holds no full text:
  * title, summary and a source line.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  26.48.0
  */
 final class ArticleMapper
 {
@@ -33,7 +33,7 @@ final class ArticleMapper
 	 *
 	 * @return  array{title: string, introtext: string, metadesc: string, created: string, note: string}
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function map(FeedItem $item, Source $source, string $sourceLine): array
 	{

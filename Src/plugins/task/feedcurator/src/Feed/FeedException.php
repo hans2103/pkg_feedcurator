@@ -19,7 +19,7 @@ namespace HKweb\Plugin\Task\Feedcurator\Feed;
 /**
  * The feed could not be read or the task settings are incomplete.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  26.48.0
  */
 class FeedException extends \RuntimeException
 {

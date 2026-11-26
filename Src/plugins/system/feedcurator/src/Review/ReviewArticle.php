@@ -22,7 +22,7 @@ namespace HKweb\Plugin\System\Feedcurator\Review;
  * The importer writes "<p>{summary}</p><p class="feedcurator-source">{source} — <a href="{link}">{text}</a></p>".
  * Every part comes back as plain text (tags stripped, entities decoded), so the page escapes it like any other value.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  26.48.0
  */
 final class ReviewArticle
 {
@@ -33,7 +33,7 @@ final class ReviewArticle
 	 *
 	 * @return  array{summary: string, source: string, link: string, linkText: string}  The link is empty unless http(s).
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public static function parse(string $introtext): array
 	{
@@ -72,7 +72,7 @@ final class ReviewArticle
 	 *
 	 * @return  string
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private static function text(string $html): string
 	{

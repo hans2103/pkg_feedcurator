@@ -19,7 +19,7 @@ namespace HKweb\Plugin\Task\Feedcurator\Feed;
 /**
  * Plain-text summary of feed HTML.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  26.48.0
  */
 final class Summary
 {
@@ -32,7 +32,7 @@ final class Summary
 	 *
 	 * @return  string  Plain text, ending in an ellipsis when it was cut.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public static function fromHtml(string $html, int $max = 300): string
 	{

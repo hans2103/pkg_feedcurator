@@ -19,7 +19,7 @@ namespace HKweb\Plugin\Task\Feedcurator\Feed;
 /**
  * Reads an RSS 2.0 or Atom feed into FeedItem objects.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  26.48.0
  */
 final class FeedParser
 {
@@ -27,7 +27,7 @@ final class FeedParser
 	 * Atom namespace.
 	 *
 	 * @var    string
-	 * @since  __DEPLOY_VERSION__
+	 * @since  26.48.0
 	 */
 	private const ATOM = 'http://www.w3.org/2005/Atom';
 
@@ -40,7 +40,7 @@ final class FeedParser
 	 *
 	 * @throws  FeedUnavailableException  When the body is neither an RSS channel nor an Atom feed.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function parse(string $xml): array
 	{
@@ -93,7 +93,7 @@ final class FeedParser
 	 *
 	 * @return  ?FeedItem  Null when the item has no title, or neither link nor guid.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function rssItem(\SimpleXMLElement $node): ?FeedItem
 	{
@@ -121,7 +121,7 @@ final class FeedParser
 	 *
 	 * @return  ?FeedItem  Null when the entry has no title, or neither link nor id.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function atomItem(\SimpleXMLElement $node): ?FeedItem
 	{
@@ -183,7 +183,7 @@ final class FeedParser
 	 *
 	 * @return  ?FeedItem  Null when the item has no title, or neither link nor guid.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function build(string $guid, string $link, string $title, string $body, array $categories, string $date): ?FeedItem
 	{
@@ -219,7 +219,7 @@ final class FeedParser
 	 *
 	 * @return  string  The text, or an empty string when the element is missing.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function text(\SimpleXMLElement $node, string $name): string
 	{
@@ -233,7 +233,7 @@ final class FeedParser
 	 *
 	 * @return  string  Plain text with collapsed whitespace.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function plain(string $value): string
 	{
@@ -249,7 +249,7 @@ final class FeedParser
 	 *
 	 * @return  ?\DateTimeImmutable  Null when empty or unreadable.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function date(string $value): ?\DateTimeImmutable
 	{

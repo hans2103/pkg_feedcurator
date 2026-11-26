@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<extension type="package" method="upgrade">
+	<name>Feed Curator</name>
+	<packagename>feedcurator</packagename>
+	<author>Hans Kuijpers</author>
+	<creationDate>2026-11-26</creationDate>
+	<copyright>Copyright (C) 2026 HKweb. All rights reserved.</copyright>
+	<license>GNU General Public License version 2 or later; see LICENSE.txt</license>
+	<authorEmail>info@hkweb.nl</authorEmail>
+	<authorUrl>https://hkweb.nl</authorUrl>
+	<version>26.48.0</version>
+	<description>PKG_FEEDCURATOR_XML_DESCRIPTION</description>
+	<blockChildUninstall>true</blockChildUninstall>
+
+	<languages folder="language">
+		<language tag="en-GB">en-GB/pkg_feedcurator.sys.ini</language>
+		<language tag="nl-NL">nl-NL/pkg_feedcurator.sys.ini</language>
+	</languages>
+
+	<scriptfile>package_script.php</scriptfile>
+
+	<files>
+		<file type="plugin" id="feedcurator" group="task">plg_task_feedcurator.zip</file>
+		<file type="plugin" id="feedcurator" group="system">plg_system_feedcurator.zip</file>
+	</files>
+
+	<updateservers>
+		<server type="extension" name="Feed Curator Updates">https://raw.githubusercontent.com/hans2103/pkg_feedcurator/main/updates.xml</server>
+	</updateservers>
+</extension>

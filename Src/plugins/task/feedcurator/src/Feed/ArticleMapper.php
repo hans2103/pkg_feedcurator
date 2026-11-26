@@ -45,6 +45,9 @@ final class ArticleMapper
 		$title = html_entity_decode(strip_tags($item->title), ENT_QUOTES | ENT_HTML5, 'UTF-8');
 		$title = trim((string) preg_replace('/[\s\x{00A0}]+/u', ' ', $title));
 
+		// #__content.title is VARCHAR(255).
+		$title = mb_substr($title, 0, 255);
+
 		$utc     = new \DateTimeZone('UTC');
 		$created = ($item->published ?? new \DateTimeImmutable('now', $utc))->setTimezone($utc);
 

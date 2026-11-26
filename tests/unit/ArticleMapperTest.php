@@ -45,6 +45,8 @@ check('introtext summary max 300', mb_strlen(strip_tags($a['introtext'])) <= 300
 $a = $mapper->map(make('<script>alert(1)</script>Titel &amp; meer', '', $date), $source, $line);
 check('title tags stripped', $a['title'], 'alert(1)Titel & meer');
 
+check('title max 255', mb_strlen($mapper->map(make(str_repeat('é', 300), '', $date), $source, $line)['title']), 255);
+
 $local = new DateTimeImmutable('2026-11-25 11:45:33', new DateTimeZone('Europe/Amsterdam'));
 check('created converted to UTC', $mapper->map(make('x', '', $local), $source, $line)['created'], '2026-11-25 10:45:33');
 

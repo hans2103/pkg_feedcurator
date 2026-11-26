@@ -1,12 +1,13 @@
 # Task plugin (plg_task_feedcurator)
 
 ### History
+- 2026-11-26: Notifier sends no mail when the site secret is empty (`PLG_TASK_FEEDCURATOR_LOG_MAIL_NO_SECRET`)
 - 2026-11-26: added `src/Mail/` (notification mail with signed review links) and the Notifier call in the routine
 - 2026-11-26: added `src/Feed/` (RSS 2.0 and Atom parser)
 - 2026-11-26: page created with the scaffold; the routine is a placeholder that returns OK
 
 Last updated: 2026-11-26
-Verified against: b62791a
+Verified against: 7c3fd72
 Covers:
 - Src/plugins/task/feedcurator/
 
@@ -31,7 +32,7 @@ Scheduled task *Import feed items* (routine `feedcurator.import`). In the scaffo
 - Language: the source line (stored content) and the log lines use the site language (`com_languages` site), not the CLI's en-GB; `Extension\Feedcurator::siteLanguage()` loads the plugin strings from `administrator/language` or else from the plugin's own `language/` folder, and `Importer::formatDate()` translates month names itself.
 - Each item gets its `#__feedcurator_items` row right after `Table\Content::store()`, before the workflow association, so a later error can't cause a duplicate.
 - `src/Mail/MailBody.php`: Joomla-free `html()` (escaped intro, one `<li>` with a link per article) and `text()` (each URL on its own line).
-- `src/Mail/Notifier.php`: `__construct(CMSApplicationInterface, DatabaseInterface, Language, ?\Closure $log)`, `notify(ImportResult, Registry): int` (mails sent). Recipients: users with `block = 0` and empty or `0` activation in `notify_groups` (unique per user); none: warning in the log, 0. One HTML mail per recipient (`AltBody` = text), each article with its own `ReviewToken` link (expiry `now + link_days` days, site secret from `$app->get('secret')`). Subject, intro and link label from the site Language (`PLG_TASK_FEEDCURATOR_MAIL_*`, singular and plural keys), not the CLI's. A mail error is logged and never fails the run. The routine calls it after a run with `created` not empty.
+- `src/Mail/Notifier.php`: `__construct(CMSApplicationInterface, DatabaseInterface, Language, ?\Closure $log)`, `notify(ImportResult, Registry): int` (mails sent). Recipients: users with `block = 0` and empty or `0` activation in `notify_groups` (unique per user); none: warning in the log, 0. Empty site secret (`ReviewToken::isUsable()` false): one error line, 0, no mail. One HTML mail per recipient (`AltBody` = text), each article with its own `ReviewToken` link (expiry `now + link_days` days, site secret from `$app->get('secret')`). Subject, intro and link label from the site Language (`PLG_TASK_FEEDCURATOR_MAIL_*`, singular and plural keys), not the CLI's. A mail error is logged and never fails the run. The routine calls it after a run with `created` not empty.
 - `src/Import/ImportResult.php`, `FailureCounter.php`: result counts; failed runs in a row per task (`shouldReport()` from `notify_after`).
 - `src/Extension/Feedcurator.php`: routine `feedcurator.import`: incomplete settings (`FeedException`) is KNOCKOUT; unavailable sources count in `FailureCounter`, KNOCKOUT from `notify_after` on, otherwise OK with a warning.
 - `forms/import.xml`: task settings (`sources` subform, `keywords`, `catid`, `created_by`, `max_age_days`, `max_per_run`, `first_run_weeks`, `notify_groups`, `site_url`, `link_days`, `notify_after`).

@@ -87,7 +87,15 @@ final class Notifier
 			return 0;
 		}
 
-		$token    = new ReviewToken((string) $this->app->get('secret'));
+		$token = new ReviewToken((string) $this->app->get('secret'));
+
+		if (!$token->isUsable())
+		{
+			($this->logger)($this->language->_('PLG_TASK_FEEDCURATOR_LOG_MAIL_NO_SECRET'), 'error');
+
+			return 0;
+		}
+
 		$siteUrl  = (string) $params->get('site_url', '');
 		$days     = max(1, (int) $params->get('link_days', 7));
 		$siteName = (string) $this->app->get('sitename');

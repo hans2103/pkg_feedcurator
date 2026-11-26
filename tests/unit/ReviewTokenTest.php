@@ -27,6 +27,22 @@ check('invalid for another secret', (new ReviewToken('other'))->verify(12, 5, $e
 check('invalid for an empty signature', $token->verify(12, 5, $expires, '', $expires - 10), false);
 check('invalid for an uppercased signature', $token->verify(12, 5, $expires, strtoupper($sig), $expires - 10), false);
 
+// isGenuine checks the signature only, not the expiry.
+check('genuine after expiry', $token->isGenuine(12, 5, $expires, $sig), true);
+check('not genuine for another user', $token->isGenuine(12, 6, $expires, $sig), false);
+
+// An empty site secret would make every link forgeable: refuse to sign, never verify.
+foreach (['', '   ', "\t\n"] as $secret) {
+	$label = json_encode($secret);
+	$empty = new ReviewToken($secret);
+	check("sign refuses secret $label", thrown(static fn () => $empty->sign(12, 5, $expires)), InvalidArgumentException::class);
+	check("verify is false for secret $label", $empty->verify(12, 5, $expires, hash_hmac('sha256', '12|5|' . $expires, hash_hmac('sha256', 'feedcurator-review', $secret)), $expires - 10), false);
+	check("isGenuine is false for secret $label", $empty->isGenuine(12, 5, $expires, hash_hmac('sha256', '12|5|' . $expires, hash_hmac('sha256', 'feedcurator-review', $secret))), false);
+	check("isUsable is false for secret $label", $empty->isUsable(), false);
+}
+
+check('isUsable is true for a real secret', $token->isUsable(), true);
+
 $url = ReviewToken::url('https://example.org/', 12, 5, $expires, $sig);
 
 check('url format', $url, "https://example.org/index.php?option=com_ajax&group=system&plugin=feedcurator&format=html&a=12&u=5&e=$expires&s=$sig");

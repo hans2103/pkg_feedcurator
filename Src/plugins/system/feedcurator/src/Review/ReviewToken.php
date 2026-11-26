@@ -21,6 +21,7 @@ namespace HKweb\Plugin\System\Feedcurator\Review;
  *
  * A link carries the article (a), the recipient (u), the expiry as a Unix timestamp (e) and an HMAC-SHA256
  * signature (s) of "a|u|e", made with a key derived from the site secret. Joomla-free.
+ * An empty site secret would make every link forgeable: sign() then refuses and verify() is always false.
  *
  * @since  __DEPLOY_VERSION__
  */
@@ -35,6 +36,14 @@ final class ReviewToken
 	private readonly string $key;
 
 	/**
+	 * Whether the site secret is usable (not empty or whitespace).
+	 *
+	 * @var    boolean
+	 * @since  __DEPLOY_VERSION__
+	 */
+	private readonly bool $usable;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param   string  $siteSecret  The secret of the site (configuration.php).
@@ -43,7 +52,20 @@ final class ReviewToken
 	 */
 	public function __construct(string $siteSecret)
 	{
-		$this->key = hash_hmac('sha256', 'feedcurator-review', $siteSecret);
+		$this->key    = hash_hmac('sha256', 'feedcurator-review', $siteSecret);
+		$this->usable = trim($siteSecret) !== '';
+	}
+
+	/**
+	 * Whether links can be signed and verified: false when the site secret is empty.
+	 *
+	 * @return  boolean
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
+	public function isUsable(): bool
+	{
+		return $this->usable;
 	}
 
 	/**
@@ -55,11 +77,35 @@ final class ReviewToken
 	 *
 	 * @return  string  Hex encoded HMAC-SHA256.
 	 *
+	 * @throws  \InvalidArgumentException  When the site secret is empty.
+	 *
 	 * @since   __DEPLOY_VERSION__
 	 */
 	public function sign(int $articleId, int $userId, int $expires): string
 	{
-		return hash_hmac('sha256', "{$articleId}|{$userId}|{$expires}", $this->key);
+		if (!$this->usable)
+		{
+			throw new \InvalidArgumentException('The site secret is empty; review links cannot be signed.');
+		}
+
+		return $this->hmac($articleId, $userId, $expires);
+	}
+
+	/**
+	 * Checks only the signature of a link, not its expiry.
+	 *
+	 * @param   integer  $articleId  The article from the link.
+	 * @param   integer  $userId     The user from the link.
+	 * @param   integer  $expires    The expiry from the link.
+	 * @param   string   $signature  The signature from the link.
+	 *
+	 * @return  boolean  True when the signature is genuine; always false with an empty site secret.
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
+	public function isGenuine(int $articleId, int $userId, int $expires, string $signature): bool
+	{
+		return $this->usable && hash_equals($this->hmac($articleId, $userId, $expires), $signature);
 	}
 
 	/**
@@ -77,7 +123,23 @@ final class ReviewToken
 	 */
 	public function verify(int $articleId, int $userId, int $expires, string $signature, int $now): bool
 	{
-		return hash_equals($this->sign($articleId, $userId, $expires), $signature) && $now <= $expires;
+		return $this->isGenuine($articleId, $userId, $expires, $signature) && $now <= $expires;
+	}
+
+	/**
+	 * The HMAC of "a|u|e" with the derived key.
+	 *
+	 * @param   integer  $articleId  The article.
+	 * @param   integer  $userId     The user.
+	 * @param   integer  $expires    The expiry.
+	 *
+	 * @return  string
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
+	private function hmac(int $articleId, int $userId, int $expires): string
+	{
+		return hash_hmac('sha256', "{$articleId}|{$userId}|{$expires}", $this->key);
 	}
 
 	/**

@@ -44,7 +44,7 @@ The links are signed with the site secret (`secret` in `configuration.php`); wit
 - **Workflows:** com_content workflows must be off (v1). With workflows on, the workflow plugin refuses the state change from the review page, and the page points to the administrator. Articles are still associated with the default stage, so they show up in Content → Articles.
 - **Site URL:** the task needs `site_url` because it runs on the CLI.
 - **Itemid:** the review page is `index.php?option=com_ajax&group=system&plugin=feedcurator&format=html` without an Itemid. If the site template treats a URL without Itemid as the homepage, the review page may show the homepage; this is a known integration point, solve it in the template (override `html/plg_system_feedcurator/review.php` or the layout choice).
-- **Page cache:** the review page sends `Cache-Control: no-store` and `noindex`, but the *System - Page Cache* plugin can still cache it. Exclude the URL from the page cache; a fix in the package may follow.
+- **Page cache:** the review page sends `Cache-Control: no-store` and `noindex`. *System - Page Cache* ignores `no-store`, so the system plugin excludes the review page from the page cache itself (`onPageCacheIsExcluded`); no setting needed.
 - The scheduler must run (cron: `php cli/joomla.php scheduler:run`), otherwise nothing is imported.
 
 ## Development

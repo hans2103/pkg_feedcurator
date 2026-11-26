@@ -12,12 +12,14 @@ declare(strict_types=1);
 
 namespace HKweb\Plugin\System\Feedcurator\Extension;
 
+use HKweb\Plugin\System\Feedcurator\Review\PageCachePolicy;
 use HKweb\Plugin\System\Feedcurator\Review\ReviewArticle;
 use HKweb\Plugin\System\Feedcurator\Review\ReviewDecision;
 use HKweb\Plugin\System\Feedcurator\Review\ReviewOutcome;
 use HKweb\Plugin\System\Feedcurator\Review\ReviewToken;
 use Joomla\CMS\Application\CMSApplicationInterface;
 use Joomla\CMS\Document\HtmlDocument;
+use Joomla\CMS\Event\PageCache\IsExcludedEvent;
 use Joomla\CMS\Event\Plugin\AjaxEvent;
 use Joomla\CMS\Language\Text;
 use Joomla\CMS\Plugin\CMSPlugin;
@@ -74,7 +76,30 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface, UserFa
 	 */
 	public static function getSubscribedEvents(): array
 	{
-		return ['onAjaxFeedcurator' => 'review'];
+		return [
+			'onAjaxFeedcurator'     => 'review',
+			'onPageCacheIsExcluded' => 'excludeFromPageCache',
+		];
+	}
+
+	/**
+	 * Keeps the review page out of System - Page Cache: the page holds a form token, and the cache ignores
+	 * Cache-Control: no-store, so a link scanner's visit would hand its token to the real recipient.
+	 *
+	 * @param   IsExcludedEvent  $event  The page cache event; receives true as a result for the review page.
+	 *
+	 * @return  void
+	 *
+	 * @since   __DEPLOY_VERSION__
+	 */
+	public function excludeFromPageCache(IsExcludedEvent $event): void
+	{
+		$input = $this->getApplication()->getInput();
+
+		if (PageCachePolicy::isExcluded($input->getCmd('option'), $input->getCmd('plugin')))
+		{
+			$event->addResult(true);
+		}
 	}
 
 	/**

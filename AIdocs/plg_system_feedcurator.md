@@ -1,12 +1,13 @@
 # System plugin (plg_system_feedcurator)
 
 ### History
+- 2026-11-26: the review page is excluded from System - Page Cache (`onPageCacheIsExcluded`, `PageCachePolicy`)
 - 2026-11-26: the review page: `review()`, `ReviewDecision`/`ReviewOutcome`, `ReviewArticle`, `tmpl/review.php`; `ReviewToken` refuses an empty secret and got `isGenuine()`
 - 2026-11-26: added `src/Review/ReviewToken.php` (signed review links)
 - 2026-11-26: page created with the scaffold; the review handler is empty
 
 Last updated: 2026-11-26
-Verified against: 00130a8
+Verified against: 1fb011c
 Covers:
 - Src/plugins/system/feedcurator/
 
@@ -18,7 +19,8 @@ The review page behind the mail link: `index.php?option=com_ajax&group=system&pl
 
 - `feedcurator.xml`: manifest, namespace `HKweb\Plugin\System\Feedcurator` on `src/`; folders `services`, `src`, `tmpl`.
 - `services/provider.php`: registers the plugin with application, database and user factory.
-- `src/Extension/Feedcurator.php`: subscriber for `onAjaxFeedcurator` (method `review(AjaxEvent)`), site client only. Loads its language, sets `X-Robots-Tag: noindex, nofollow`, `Cache-Control: no-store`, the page title and a robots meta, and adds the rendered HTML as the event result. com_ajax echoes that into the component area, so with `format=html` the page renders in the site template.
+- `src/Review/PageCachePolicy.php`: `isExcluded(option, plugin)`, true for `com_ajax` + `feedcurator`. Joomla-free.
+- `src/Extension/Feedcurator.php`: subscriber for `onPageCacheIsExcluded` (method `excludeFromPageCache(IsExcludedEvent)`: adds `true` for the review page, so System - Page Cache never stores or serves it) and for `onAjaxFeedcurator` (method `review(AjaxEvent)`), site client only. Loads its language, sets `X-Robots-Tag: noindex, nofollow`, `Cache-Control: no-store`, the page title and a robots meta, and adds the rendered HTML as the event result. com_ajax echoes that into the component area, so with `format=html` the page renders in the site template.
 - `src/Review/ReviewToken.php`: Joomla-free. Key = `hash_hmac('sha256', 'feedcurator-review', siteSecret)`; `sign(a, u, e)` = hex HMAC-SHA256 of `a|u|e` (throws `\InvalidArgumentException` when the secret is empty or whitespace); `isGenuine(a, u, e, s)` checks the signature only (`hash_equals`); `verify(a, u, e, s, now)` adds the expiry (false after `e`); `isUsable()`; static `url(siteUrl, a, u, e, s)`. With an empty secret nothing verifies.
 - `src/Review/ReviewOutcome.php`: enum `Show`, `Invalid`, `Expired`, `AlreadyDone` (`done`), `Act`.
 - `src/Review/ReviewDecision.php`: Joomla-free `decide(signatureValid, expired, articleState, isPost, action)`: invalid signature → Invalid (before expiry); expired → Expired; POST with an action other than `publish`/`discard` → Invalid; state ≠ 0 → AlreadyDone; GET → Show; POST → Act.
@@ -37,5 +39,5 @@ The review page behind the mail link: `index.php?option=com_ajax&group=system&pl
 ## Known limits
 
 - com_content workflows must be off (v1); with workflows on, publishing fails and the page points to the administrator.
-- The page sends `Cache-Control: no-store`, but the System - Page Cache plugin can still cache it; a fix may follow.
+- The page sends `Cache-Control: no-store`, which System - Page Cache ignores; the plugin therefore excludes the review page from the page cache itself (see `excludeFromPageCache()`).
 - A site template that treats a URL without Itemid as the homepage may show the homepage instead of the review page.

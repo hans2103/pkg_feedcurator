@@ -57,13 +57,15 @@ final readonly class FeedItem
 	{
 		$link = trim($this->link);
 
-		if ($link === '') {
+		if ($link === '')
+		{
 			return hash('sha256', $this->guid);
 		}
 
 		$hash = strpos($link, '#');
 
-		if ($hash !== false) {
+		if ($hash !== false)
+		{
 			$link = substr($link, 0, $hash);
 		}
 

@@ -24,6 +24,14 @@ namespace HKweb\Plugin\Task\Feedcurator\Feed;
 final class FeedParser
 {
 	/**
+	 * Atom namespace.
+	 *
+	 * @var    string
+	 * @since  __DEPLOY_VERSION__
+	 */
+	private const ATOM = 'http://www.w3.org/2005/Atom';
+
+	/**
 	 * Parses a feed.
 	 *
 	 * @param   string  $xml  The feed as received.
@@ -38,42 +46,45 @@ final class FeedParser
 	{
 		$previous = libxml_use_internal_errors(true);
 
-		try {
+		try
+		{
 			// LIBXML_NONET: never fetch anything; without LIBXML_NOENT entities are not substituted.
 			$root = simplexml_load_string($xml, \SimpleXMLElement::class, \LIBXML_NONET | \LIBXML_NOCDATA);
-		} finally {
+		}
+		finally
+		{
 			libxml_clear_errors();
 			libxml_use_internal_errors($previous);
 		}
 
-		if (!$root instanceof \SimpleXMLElement) {
+		if (!$root instanceof \SimpleXMLElement)
+		{
 			throw new FeedUnavailableException('Geen geldige RSS- of Atom-feed ontvangen.');
 		}
 
 		$items = [];
 
-		if (isset($root->channel)) {
-			foreach ($root->channel->item as $node) {
+		if (isset($root->channel))
+		{
+			foreach ($root->channel->item as $node)
+			{
 				$items[] = $this->rssItem($node);
 			}
-		} elseif ($root->getName() === 'feed') {
-			foreach ($root->children(self::ATOM)->entry as $node) {
+		}
+		elseif ($root->getName() === 'feed')
+		{
+			foreach ($root->children(self::ATOM)->entry as $node)
+			{
 				$items[] = $this->atomItem($node);
 			}
-		} else {
+		}
+		else
+		{
 			throw new FeedUnavailableException('Geen geldige RSS- of Atom-feed ontvangen.');
 		}
 
 		return array_values(array_filter($items, static fn (?FeedItem $item): bool => $item !== null));
 	}
-
-	/**
-	 * Atom namespace.
-	 *
-	 * @var    string
-	 * @since  __DEPLOY_VERSION__
-	 */
-	private const ATOM = 'http://www.w3.org/2005/Atom';
 
 	/**
 	 * One RSS <item> as FeedItem.
@@ -88,7 +99,8 @@ final class FeedParser
 	{
 		$categories = [];
 
-		foreach ($node->category as $category) {
+		foreach ($node->category as $category)
+		{
 			$categories[] = (string) $category;
 		}
 
@@ -116,11 +128,13 @@ final class FeedParser
 		$atom = $node->children(self::ATOM);
 		$link = '';
 
-		foreach ($atom->link as $candidate) {
+		foreach ($atom->link as $candidate)
+		{
 			$attributes = $candidate->attributes();
 			$rel        = (string) ($attributes['rel'] ?? '');
 
-			if ($rel === '' || $rel === 'alternate') {
+			if ($rel === '' || $rel === 'alternate')
+			{
 				$link = (string) ($attributes['href'] ?? '');
 				break;
 			}
@@ -128,25 +142,29 @@ final class FeedParser
 
 		$categories = [];
 
-		foreach ($atom->category as $category) {
+		foreach ($atom->category as $category)
+		{
 			$attributes = $category->attributes();
 			$label      = (string) ($attributes['label'] ?? '');
 			$term       = $label !== '' ? $label : (string) ($attributes['term'] ?? '');
 
-			if ($term !== '') {
+			if ($term !== '')
+			{
 				$categories[] = $term;
 			}
 		}
 
 		$body = $this->text($atom, 'content');
 
-		if ($body === '') {
+		if ($body === '')
+		{
 			$body = $this->text($atom, 'summary');
 		}
 
 		$date = $this->text($atom, 'published');
 
-		if ($date === '') {
+		if ($date === '')
+		{
 			$date = $this->text($atom, 'updated');
 		}
 
@@ -173,16 +191,19 @@ final class FeedParser
 		$link  = trim($link);
 		$title = $this->plain($title);
 
-		if ($title === '' || ($link === '' && $guid === '')) {
+		if ($title === '' || ($link === '' && $guid === ''))
+		{
 			return null;
 		}
 
 		$labels = [];
 
-		foreach ($categories as $category) {
+		foreach ($categories as $category)
+		{
 			$label = $this->plain($category);
 
-			if ($label !== '' && !\in_array($label, $labels, true)) {
+			if ($label !== '' && !\in_array($label, $labels, true))
+			{
 				$labels[] = $label;
 			}
 		}
@@ -232,13 +253,17 @@ final class FeedParser
 	 */
 	private function date(string $value): ?\DateTimeImmutable
 	{
-		if (trim($value) === '') {
+		if (trim($value) === '')
+		{
 			return null;
 		}
 
-		try {
+		try
+		{
 			return new \DateTimeImmutable(trim($value));
-		} catch (\Exception) {
+		}
+		catch (\Exception)
+		{
 			return null;
 		}
 	}

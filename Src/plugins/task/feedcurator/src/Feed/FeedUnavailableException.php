@@ -19,7 +19,7 @@ namespace HKweb\Plugin\Task\Feedcurator\Feed;
 /**
  * The feed is temporarily unavailable: no answer, an HTTP error or a body that is no RSS or Atom feed.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  26.48.0
  */
 final class FeedUnavailableException extends FeedException
 {

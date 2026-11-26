@@ -29,7 +29,7 @@ use Joomla\Registry\Registry;
 /**
  * Mails the board members one message about the new concept articles, each with a personal signed review link.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  26.48.0
  */
 final class Notifier
 {
@@ -37,7 +37,7 @@ final class Notifier
 	 * Writes a line to the task log.
 	 *
 	 * @var    \Closure(string, string): void
-	 * @since  __DEPLOY_VERSION__
+	 * @since  26.48.0
 	 */
 	private readonly \Closure $logger;
 
@@ -49,7 +49,7 @@ final class Notifier
 	 * @param   Language                 $language  The language of the site: the mail is in the site language, not that of the CLI.
 	 * @param   ?\Closure                $log       Receives a message and a level (info, warning, error); default: no logging.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function __construct(
 		private readonly CMSApplicationInterface $app,
@@ -69,7 +69,7 @@ final class Notifier
 	 *
 	 * @return  integer  The number of mails sent.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function notify(ImportResult $result, Registry $params): int
 	{
@@ -163,7 +163,7 @@ final class Notifier
 	 *
 	 * @return  list<array{id: int, name: string, email: string}>
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function recipients(array $groups): array
 	{

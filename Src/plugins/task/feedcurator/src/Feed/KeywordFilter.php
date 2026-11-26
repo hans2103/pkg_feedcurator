@@ -22,7 +22,7 @@ namespace HKweb\Plugin\Task\Feedcurator\Feed;
  * Terms match whole words, case-insensitively; a trailing * matches any word ending,
  * whitespace in a phrase matches any whitespace.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  26.48.0
  */
 final class KeywordFilter
 {
@@ -40,7 +40,7 @@ final class KeywordFilter
 	 * @param   list<string>  $include  Terms of which at least one must match.
 	 * @param   list<string>  $exclude  Terms that reject an item.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function __construct(array $include, array $exclude)
 	{
@@ -56,7 +56,7 @@ final class KeywordFilter
 	 *
 	 * @return  bool
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function matches(FeedItem $item): bool
 	{
@@ -95,7 +95,7 @@ final class KeywordFilter
 	 *
 	 * @return  list<string>
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public static function parseList(string $text): array
 	{
@@ -121,7 +121,7 @@ final class KeywordFilter
 	 *
 	 * @return  list<string>
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private static function patterns(array $terms): array
 	{
@@ -151,7 +151,7 @@ final class KeywordFilter
 	 *
 	 * @return  ?string  Regular expression, or null when the term has no word.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private static function pattern(string $term): ?string
 	{

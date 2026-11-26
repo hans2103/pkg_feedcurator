@@ -21,7 +21,7 @@ namespace HKweb\Plugin\System\Feedcurator\Review;
  *
  * Only a POST can lead to a change (Act); a GET, for example by a link scanner, at most shows the form.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  26.48.0
  */
 final class ReviewDecision
 {
@@ -29,7 +29,7 @@ final class ReviewDecision
 	 * The actions a POST may carry.
 	 *
 	 * @var    list<string>
-	 * @since  __DEPLOY_VERSION__
+	 * @since  26.48.0
 	 */
 	public const ACTIONS = ['publish', 'discard'];
 
@@ -44,7 +44,7 @@ final class ReviewDecision
 	 *
 	 * @return  ReviewOutcome
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public static function decide(bool $signatureValid, bool $expired, int $articleState, bool $isPost, ?string $action): ReviewOutcome
 	{

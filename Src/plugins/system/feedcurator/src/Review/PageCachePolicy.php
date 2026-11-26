@@ -22,7 +22,7 @@ namespace HKweb\Plugin\System\Feedcurator\Review;
  * The review page carries a form token. A cached copy would hand the token of the first visitor (for example a
  * link scanner) to the real recipient, and the POST would fail.
  *
- * @since  __DEPLOY_VERSION__
+ * @since  26.48.0
  */
 final class PageCachePolicy
 {
@@ -34,7 +34,7 @@ final class PageCachePolicy
 	 *
 	 * @return  boolean
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public static function isExcluded(?string $option, ?string $plugin): bool
 	{

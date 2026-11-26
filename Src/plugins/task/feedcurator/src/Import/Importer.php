@@ -45,7 +45,7 @@ use Joomla\String\StringHelper;
  * when the editors delete the article. The table #__feedcurator_sources remembers which sources have
  * had their one-time look-back (first_run_weeks).
  *
- * @since  __DEPLOY_VERSION__
+ * @since  26.48.0
  */
 final class Importer
 {
@@ -53,7 +53,7 @@ final class Importer
 	 * Writes a line to the task log.
 	 *
 	 * @var    \Closure(string, string): void
-	 * @since  __DEPLOY_VERSION__
+	 * @since  26.48.0
 	 */
 	private readonly \Closure $logger;
 
@@ -66,7 +66,7 @@ final class Importer
 	 * @param   Language                 $language  The language of the site: the source line is stored content.
 	 * @param   ?\Closure                $log       Receives a message and a level (info, warning, error); default: no logging.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function __construct(
 		private readonly CMSApplicationInterface $app,
@@ -89,7 +89,7 @@ final class Importer
 	 *
 	 * @throws  FeedException  When the settings are incomplete.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	public function run(Registry $params, int $taskId): ImportResult
 	{
@@ -212,7 +212,7 @@ final class Importer
 	 *
 	 * @return  list<Source>
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function sources(Registry $params): array
 	{
@@ -240,7 +240,7 @@ final class Importer
 	 *
 	 * @throws  FeedUnavailableException  When the feed can't be reached or doesn't answer with HTTP 200.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function fetch(Source $source): string
 	{
@@ -272,7 +272,7 @@ final class Importer
 	 *
 	 * @return  boolean
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function hasLookedBack(int $taskId, Source $source): bool
 	{
@@ -296,7 +296,7 @@ final class Importer
 	 *
 	 * @return  void
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function markLookedBack(int $taskId, Source $source): void
 	{
@@ -323,7 +323,7 @@ final class Importer
 	 *
 	 * @return  array<string, true>
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function knownKeys(array $keys): array
 	{
@@ -359,7 +359,7 @@ final class Importer
 	 *
 	 * @throws  \RuntimeException  When the article can't be saved.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function import(FeedItem $item, Source $source, string $key, ArticleMapper $mapper, int $catid, int $author): array
 	{
@@ -421,7 +421,7 @@ final class Importer
 	 *
 	 * @throws  \RuntimeException  When the article can't be saved or a content plugin stops it.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function store(Content $article, \Closure $remember): void
 	{
@@ -471,7 +471,7 @@ final class Importer
 	 *
 	 * @return  void
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function log(string $message, string $level): void
 	{
@@ -488,7 +488,7 @@ final class Importer
 	 *
 	 * @return  string
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function formatDate(string $utc): string
 	{
@@ -526,7 +526,7 @@ final class Importer
 	 *
 	 * @return  string  The alias.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function uniqueAlias(string $title, int $catid): string
 	{
@@ -548,7 +548,7 @@ final class Importer
 	 *
 	 * @return  integer  The user id, or 0 when there is none.
 	 *
-	 * @since   __DEPLOY_VERSION__
+	 * @since   26.48.0
 	 */
 	private function fallbackAuthor(): int
 	{

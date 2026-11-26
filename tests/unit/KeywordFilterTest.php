@@ -48,6 +48,12 @@ check('empty include matches nothing', (new KeywordFilter([], []))->matches(item
 check('wildcard-only term matches nothing', (new KeywordFilter(['*'], []))->matches(item('Wmo')), false);
 check('double wildcard matches nothing', (new KeywordFilter(['**'], []))->matches(item('Wmo')), false);
 check('empty term matches nothing', (new KeywordFilter([''], []))->matches(item('Wmo')), false);
+foreach (["\u{00A0}", "*\u{00A0}*", "\x0B"] as $i => $t)
+{
+	check("whitespace-only term $i matches nothing", (new KeywordFilter([$t], []))->matches(item('Nieuws', '', [])), false);
+}
+check('parseList trims nbsp', KeywordFilter::parseList("\u{00A0}\nWmo\u{00A0}"), ['Wmo']);
+check('nbsp-padded term matches', (new KeywordFilter(["\u{00A0}Wmo\u{00A0}"], []))->matches(item('De Wmo')), true);
 $f = new KeywordFilter(['*', 'Wmo'], []);
 check('stray * does not break real term', $f->matches(item('De Wmo')), true);
 check('stray * does not match unrelated', $f->matches(item('Fietsen')), false);

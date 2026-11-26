@@ -103,7 +103,7 @@ final class KeywordFilter
 
 		foreach (preg_split('/\R/u', $text) ?: [] as $line)
 		{
-			$line = trim($line);
+			$line = (string) preg_replace('/^[\s\x{00A0}]+|[\s\x{00A0}]+$/u', '', $line);
 
 			if ($line !== '' && !isset($terms[mb_strtolower($line)]))
 			{
@@ -129,7 +129,7 @@ final class KeywordFilter
 
 		foreach ($terms as $term)
 		{
-			if (trim($term, "* \t\n\r") !== '')
+			if (preg_match('/^[\s\x{00A0}*]*$/u', $term) !== 1)
 			{
 				$patterns[] = self::pattern($term);
 			}
@@ -148,7 +148,7 @@ final class KeywordFilter
 	private static function pattern(string $term): string
 	{
 		$wildcard = str_ends_with($term, '*');
-		$words    = preg_split('/\s+/u', trim($term, "* \t\n\r")) ?: [];
+		$words    = preg_split('/[\s\x{00A0}]+/u', (string) preg_replace('/^[\s\x{00A0}*]+|[\s\x{00A0}*]+$/u', '', $term)) ?: [];
 		$regex    = implode('\s+', array_map(static fn (string $w): string => preg_quote($w, '/'), $words));
 
 		return '/(?<!\w)' . $regex . ($wildcard ? '\w*' : '') . '(?!\w)/iu';

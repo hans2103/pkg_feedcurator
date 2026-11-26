@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+<channel>
+	<title>Gemeente Voorbeeldstad</title>
+	<link>https://gemeente.example.net</link>
+	<description>Verzonnen gemeentenieuws</description>
+	<item>
+		<title>Parkeerregels in het centrum</title>
+		<link>https://gemeente.example.net/nieuws/parkeerregels</link>
+		<description>Er komen nieuwe parkeerregels.</description>
+		<pubDate>Mon, 23 Nov 2026 14:30:00 +0100</pubDate>
+		<guid>https://gemeente.example.net/nieuws/parkeerregels</guid>
+		<enclosure url="https://gemeente.example.net/media/parkeren.jpg" length="12345" type="image/jpeg"/>
+	</item>
+	<item>
+		<title>Bericht zonder link of guid</title>
+		<description>Dit item wordt overgeslagen.</description>
+	</item>
+	<item>
+		<link>https://gemeente.example.net/nieuws/zonder-titel</link>
+		<description>Dit item heeft geen titel.</description>
+	</item>
+</channel>
+</rss>

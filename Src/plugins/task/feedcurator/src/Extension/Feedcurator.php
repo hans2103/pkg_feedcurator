@@ -15,6 +15,7 @@ namespace HKweb\Plugin\Task\Feedcurator\Extension;
 use HKweb\Plugin\Task\Feedcurator\Feed\FeedException;
 use HKweb\Plugin\Task\Feedcurator\Import\FailureCounter;
 use HKweb\Plugin\Task\Feedcurator\Import\Importer;
+use HKweb\Plugin\Task\Feedcurator\Mail\Notifier;
 use Joomla\CMS\Component\ComponentHelper;
 use Joomla\CMS\Language\Language;
 use Joomla\CMS\Language\LanguageFactoryInterface;
@@ -139,6 +140,11 @@ final class Feedcurator extends CMSPlugin implements SubscriberInterface
 				$result->failed
 			)
 		);
+
+		if ($result->created !== [])
+		{
+			(new Notifier($this->getApplication(), $this->getDatabase(), $language, $this->logTask(...)))->notify($result, $params);
+		}
 
 		if ($result->unavailable !== [])
 		{

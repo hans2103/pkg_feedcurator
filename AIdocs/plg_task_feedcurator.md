@@ -23,6 +23,7 @@ Scheduled task *Import feed items* (routine `feedcurator.import`). In the scaffo
 - `src/Feed/Source.php`: readonly settings of one source (`name`, `url`, `filter`, `keywords`, `exclude`, `enabled`); `fromArray()` builds it from a subform row, keyword textareas via `KeywordFilter::parseList()`.
 - `src/Feed/KeywordFilter.php`: `matches(FeedItem)` tests title, description (tags stripped) and categories against include and exclude terms: whole words, case-insensitive, trailing `*` is a word-ending wildcard, phrases match any whitespace. An exclude term wins; no include terms means no match. `parseList()` splits a textarea (one term per line, deduplicated).
 - `src/Feed/Summary.php`: `fromHtml()` removes the WordPress "Het bericht ... verscheen eerst op ..." footer, tags and entities, collapses whitespace and cuts at the last space before 300 characters with an ellipsis.
+- `src/Feed/ArticleMapper.php`: `map(FeedItem, Source, sourceLine)` returns the article fields: `title` (tags stripped), `introtext` (`<p>` escaped summary + the ready-made source line; only the line when the summary is empty), `metadesc` (summary cut at 159 characters, so at most 160 with the ellipsis), `created` (UTC) and `note` (`feedcurator:<source>`, max 255).
 - `src/Feed/FeedException.php`, `FeedUnavailableException.php`: error types.
 - `forms/import.xml`: task settings (empty for now).
 - `language/{en-GB,nl-NL}/`: `plg_task_feedcurator.ini` and `.sys.ini`.
